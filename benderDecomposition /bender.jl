@@ -4,19 +4,42 @@ using GLPK
 using LinearAlgebra
 function benders()
     # definition du problème maitre
-    c1=[-2;-8]
-    c2=[-1; -7]
+    #exemple infaisable
+    c1=[1;6;5;7]                    # n1 x 1
+    c2=[9;3;0;2;3]                  # n2 x 1
+    b=[-3;-4;1;4;5]                   # m  x 1
+    A1=[
+        0 -2 3 2;
+        -5 0 -3 1;
+        1 0 4 -2;
+        0 -3 4 -1;
+        -5 -4 3 0
+        ]
+     A2=[
+        3 4 2 0 -5;
+        0 2 3 -2 1;
+        2 0 1 -3 -5;
+        -5 3 -2 -3 0;
+        -2 3 -1 2 -4
+        ]
+#exemple faisable
+#        c1=[-2;-8]
+#        c2=[-1; -7]
+#        b=[-1;-2]
+#        A1=[
+#        4 -7;
+#        -5 -3
+#        ]
+#        A2=[
+#        5 -1;
+#        -3 -2
+#        ]
+
+
+
     dimentionX=length(c1)
     dimentionU=length(c2)
-    b=[-1;-2]
-    A1=[
-    4 -7;
-    -5 -3
-    ]
-    A2=[
-    5 -1;
-    -3 -2
-    ]
+
     M=1000
 
     masterProblem = Model(optimizer_with_attributes(GLPK.Optimizer, "tm_lim" => 60000, "msg_lev" => GLPK.OFF))
@@ -123,7 +146,7 @@ function benders()
         end
 
         iC=iC+1
-        
+
     end
 end
 benders()
