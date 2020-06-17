@@ -1,0 +1,434 @@
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+FICO Xpress v8.9.0, Hyper, solve started 13:49:19, Jun 16, 2020
+Heap usage: 91KB (peak 91KB, 1093KB system)
+Minimizing LP 
+Original problem has:
+        16 rows           60 cols           32 elements
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [ 1.00e+00,  1.00e+00] / [ 1.00e+00,  1.00e+00]
+  RHS and bounds [min,max] : [ 3.07e+00,  4.73e+03] / [ 3.07e+00,  4.73e+03]
+  Objective      [min,max] : [ 1.00e+00,  1.00e+00] / [ 1.00e+00,  1.00e+00]
+Autoscaling applied standard scaling
+
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0           .000000      D     12     0        .000000     0
+     1           .000000      D     11     0        .000000     0
+Problem is infeasible
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+FICO Xpress v8.9.0, Hyper, solve started 13:51:10, Jun 16, 2020
+Heap usage: 91KB (peak 91KB, 1093KB system)
+Minimizing LP 
+Original problem has:
+        16 rows           60 cols           32 elements
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [ 1.00e+00,  1.00e+00] / [ 1.00e+00,  1.00e+00]
+  RHS and bounds [min,max] : [ 3.07e+00,  4.73e+03] / [ 3.07e+00,  4.73e+03]
+  Objective      [min,max] : [ 1.00e+00,  1.00e+00] / [ 1.00e+00,  1.00e+00]
+Autoscaling applied standard scaling
+
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0           .000000      D     12     0        .000000     0
+Problem is infeasible
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+FICO Xpress v8.9.0, Hyper, solve started 13:54:38, Jun 16, 2020
+Heap usage: 91KB (peak 91KB, 1093KB system)
+Minimizing LP 
+Original problem has:
+        16 rows           60 cols           32 elements
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [ 1.00e+00,  1.00e+00] / [ 1.00e+00,  1.00e+00]
+  RHS and bounds [min,max] : [ 3.07e+00,  4.73e+03] / [ 3.07e+00,  4.73e+03]
+  Objective      [min,max] : [ 1.00e+00,  1.00e+00] / [ 1.00e+00,  1.00e+00]
+Autoscaling applied standard scaling
+
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0           .000000      D     12     0        .000000     0
+Problem is infeasible
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+FICO Xpress v8.9.0, Hyper, solve started 13:55:40, Jun 16, 2020
+Heap usage: 91KB (peak 91KB, 1093KB system)
+Minimizing LP 
+Original problem has:
+        16 rows           60 cols           32 elements
+ 
+ 
+The problem is infeasible due to row R1
+Presolve finished in 0 seconds
+Heap usage: 90KB (peak 117KB, 1094KB system)
+?422 Error: Solution is not available
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+FICO Xpress v8.9.0, Hyper, solve started 13:57:39, Jun 16, 2020
+Heap usage: 91KB (peak 91KB, 1093KB system)
+Minimizing LP 
+Original problem has:
+        16 rows           60 cols           32 elements
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [ 1.00e+00,  1.00e+00] / [ 1.00e+00,  1.00e+00]
+  RHS and bounds [min,max] : [ 3.07e+00,  4.73e+03] / [ 3.07e+00,  4.73e+03]
+  Objective      [min,max] : [ 1.00e+00,  1.00e+00] / [ 1.00e+00,  1.00e+00]
+Autoscaling applied standard scaling
+
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0           .000000      D     12     0        .000000     0
+Problem is infeasible
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+FICO Xpress v8.9.0, Hyper, solve started 14:00:28, Jun 16, 2020
+Heap usage: 88KB (peak 88KB, 1093KB system)
+Maximizing LP 
+Original problem has:
+         0 rows           60 cols            0 elements
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [      0.0,       0.0] / [      0.0,       0.0]
+  RHS and bounds [min,max] : [ 7.98e+01,  4.73e+03] / [ 7.98e+01,  4.73e+03]
+  Objective      [min,max] : [ 1.00e+00,  1.00e+00] / [ 1.00e+00,  1.00e+00]
+Autoscaling applied standard scaling
+
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0       29791.18500      D      0     0        .000000     0
+Optimal solution found
+Dual solved problem
+  0 simplex iterations in 0s
+
+Final objective                       : 2.979118499999999e+04
+  Max primal violation      (abs/rel) :       0.0 /       0.0
+  Max dual violation        (abs/rel) :       0.0 /       0.0
+  Max complementarity viol. (abs/rel) :       0.0 /       0.0
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+FICO Xpress v8.9.0, Hyper, solve started 14:01:26, Jun 16, 2020
+Heap usage: 88KB (peak 88KB, 1093KB system)
+Maximizing LP 
+Original problem has:
+         0 rows           60 cols            0 elements
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [      0.0,       0.0] / [      0.0,       0.0]
+  RHS and bounds [min,max] : [ 7.98e+01,  4.73e+03] / [ 7.98e+01,  4.73e+03]
+  Objective      [min,max] : [ 1.00e+00,  1.00e+00] / [ 1.00e+00,  1.00e+00]
+Autoscaling applied standard scaling
+
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0       29791.18500      D      0     0        .000000     0
+Optimal solution found
+Dual solved problem
+  0 simplex iterations in 0s
+
+Final objective                       : 2.979118499999999e+04
+  Max primal violation      (abs/rel) :       0.0 /       0.0
+  Max dual violation        (abs/rel) :       0.0 /       0.0
+  Max complementarity viol. (abs/rel) :       0.0 /       0.0
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+FICO Xpress v8.9.0, Hyper, solve started 14:02:41, Jun 16, 2020
+Heap usage: 91KB (peak 91KB, 1093KB system)
+Maximizing LP 
+Original problem has:
+        16 rows           60 cols           32 elements
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [ 1.00e+00,  1.00e+00] / [ 1.00e+00,  1.00e+00]
+  RHS and bounds [min,max] : [ 3.07e+00,  4.73e+03] / [ 3.07e+00,  4.73e+03]
+  Objective      [min,max] : [ 1.00e+00,  1.00e+00] / [ 1.00e+00,  1.00e+00]
+Autoscaling applied standard scaling
+
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0       29791.18500      D     12     0        .000000     0
+    12       29791.18500      D      0     0        .000000     0
+Optimal solution found
+Dual solved problem
+  12 simplex iterations in 0s
+
+Final objective                       : 2.979118499999999e+04
+  Max primal violation      (abs/rel) :       0.0 /       0.0
+  Max dual violation        (abs/rel) :       0.0 /       0.0
+  Max complementarity viol. (abs/rel) :       0.0 /       0.0
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+FICO Xpress v8.9.0, Hyper, solve started 14:04:36, Jun 16, 2020
+Heap usage: 92KB (peak 92KB, 1093KB system)
+Maximizing LP 
+Original problem has:
+        16 rows           60 cols           88 elements
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [ 8.64e-02,  1.00e+00] / [ 6.91e-01,  1.00e+00]
+  RHS and bounds [min,max] : [ 3.07e+00,  4.73e+03] / [ 3.07e+00,  4.73e+03]
+  Objective      [min,max] : [ 1.00e+00,  1.00e+00] / [ 1.00e+00,  8.00e+00]
+Autoscaling applied standard scaling
+
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0       29791.18500      D     16     0        .000000     0
+    16       29791.18500      D      0     0        .000000     0
+Optimal solution found
+Dual solved problem
+  16 simplex iterations in 0s
+
+Final objective                       : 2.979118499999999e+04
+  Max primal violation      (abs/rel) :       0.0 /       0.0
+  Max dual violation        (abs/rel) :       0.0 /       0.0
+  Max complementarity viol. (abs/rel) :       0.0 /       0.0
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+FICO Xpress v8.9.0, Hyper, solve started 14:07:23, Jun 16, 2020
+Heap usage: 92KB (peak 92KB, 1093KB system)
+Maximizing LP 
+Original problem has:
+        16 rows           60 cols           88 elements
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [ 8.64e-02,  1.00e+00] / [ 6.91e-01,  1.00e+00]
+  RHS and bounds [min,max] : [ 3.07e+00,  1.00e+12] / [ 3.07e+00,  1.00e+12]
+  Objective      [min,max] : [ 1.00e+00,  1.00e+00] / [ 1.00e+00,  8.00e+00]
+Autoscaling applied standard scaling
+
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0       29791.18500      D     16     0        .000000     0
+    16       29791.18500      D      0     0        .000000     0
+Optimal solution found
+Dual solved problem
+  16 simplex iterations in 0s
+
+Final objective                       : 2.979118499999999e+04
+  Max primal violation      (abs/rel) :       0.0 /       0.0
+  Max dual violation        (abs/rel) :       0.0 /       0.0
+  Max complementarity viol. (abs/rel) :       0.0 /       0.0
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+FICO Xpress v8.9.0, Hyper, solve started 14:09:22, Jun 16, 2020
+Heap usage: 92KB (peak 92KB, 1093KB system)
+Maximizing LP 
+Original problem has:
+        16 rows           60 cols           88 elements
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [ 8.64e-02,  1.00e+00] / [ 6.91e-01,  1.00e+00]
+  RHS and bounds [min,max] : [ 3.07e+00,  4.73e+03] / [ 3.07e+00,  4.73e+03]
+  Objective      [min,max] : [ 1.00e+00,  1.00e+00] / [ 1.00e+00,  8.00e+00]
+Autoscaling applied standard scaling
+
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0       29791.18500      D     16     0        .000000     0
+    16       29791.18500      D      0     0        .000000     0
+Optimal solution found
+Dual solved problem
+  16 simplex iterations in 0s
+
+Final objective                       : 2.979118499999999e+04
+  Max primal violation      (abs/rel) :       0.0 /       0.0
+  Max dual violation        (abs/rel) :       0.0 /       0.0
+  Max complementarity viol. (abs/rel) :       0.0 /       0.0
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+ 
+Reading Problem 
+Problem Statistics
+           0 (      0 spare) rows
+           0 (      0 spare) structural columns
+           0 (      0 spare) non-zero elements
+Global Statistics
+           0 entities        0 sets        0 set members
+FICO Xpress v8.9.0, Hyper, solve started 14:11:47, Jun 16, 2020
+Heap usage: 91KB (peak 91KB, 1093KB system)
+Maximizing LP 
+Original problem has:
+        16 rows           60 cols           48 elements
+
+Coefficient range                    original                 solved        
+  Coefficients   [min,max] : [ 8.64e-02,  1.00e+00] / [ 6.91e-01,  1.00e+00]
+  RHS and bounds [min,max] : [ 7.98e+01,  4.73e+03] / [ 7.98e+01,  4.73e+03]
+  Objective      [min,max] : [ 1.00e+00,  1.00e+00] / [ 1.00e+00,  8.00e+00]
+Autoscaling applied standard scaling
+
+ 
+   Its         Obj Value      S   Ninf  Nneg   Sum Dual Inf  Time
+     0       29791.18500      D     16     0        .000000     0
+    17       18414.95611      D      0     0        .000000     0
+Optimal solution found
+Dual solved problem
+  17 simplex iterations in 0s
+
+Final objective                       : 1.841495611111111e+04
+  Max primal violation      (abs/rel) :       0.0 /       0.0
+  Max dual violation        (abs/rel) : 8.882e-16 / 8.882e-16
+  Max complementarity viol. (abs/rel) :       0.0 /       0.0
