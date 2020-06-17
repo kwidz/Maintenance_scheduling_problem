@@ -2,9 +2,9 @@ using JuMP, GLPK
 
 
 #an hyperplane is made for Calculating the power fuction of a powerhouse
-#x is a coefficient for this hyper plane
-#y is a coefficient of stored water
-# z is a coefficient of discharged water
+# z is a coefficient for this hyper plane
+# y is a coefficient of stored water
+# x is a coefficient of discharged water
 # the equation is x+y*stored+z*discharge
 #it return an instant power in MW
 mutable struct hyperplane
@@ -40,27 +40,46 @@ function read_hyperplanes(path)
   open(path) do file
     for ln in eachline(file)
       m=match(
-        r"(?<x>[-+]?\d+\.?\d*)\s(?<y>[-+]?\d+\.?\d*)\s(?<z>[-+]?\d+\.?\d*)",
-        ln)
+      r"(?<x>[-+]?\d+\.?\d*)\s(?<y>[-+]?\d+\.?\d*)\s(?<z>[-+]?\d+\.?\d*)",
+      ln)
       if m !== nothing
         x=parse(Float64,m[:x])
         y=parse(Float64,m[:y])
         z=parse(Float64,m[:z])
         push!(hyperplanes,hyperplane(x,y,z))
+      end
+    end
+    return hyperplanes
+  end
+end
+#this function is reading a 30 days inflow scenario
+#in the red file, there is 62 scenario, instance is an integer who is selectingm
+#the good inflow scenario.
+function read_inflows(path, instance=1)
+  inflows=[]
+  firstline=true
+  open(path) do file
+    for ln in eachline(file)
+      if !firstline
+        inflow=SubString.(ln, findall(r"\S+",ln))
+        push!(inflows,parse(Float64,inflow[1]))
+      else
+        firstline=false
+      end
     end
   end
-  return hyperplanes
+  return inflows
 end
 
-
-
-end
-
+#for now this function is creating an array of power houses and most parameters
+#are typed by hand,
+#TODO create a function to read all parameters in a json file insted of type them
+#by hand here so next users will not have to opend and changes things in this code !
 
 function read_parameters()
   ccd=powerhouse(
   "CCD",
-  [6.2956000e+02,6.3400000e+02,7.9235000e+02,7.8936000e+02],
+  read_inflows("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/cd-Original.dat",1),
   199.715,
   380.5,
   353.8,
@@ -72,7 +91,7 @@ function read_parameters()
   )
   ccs=powerhouse(
   "CCS",
-  [3.7800000e+01,3.7300000e+01,3.6500000e+01,3.5500000e+01],
+  read_inflows("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/cs-Original.dat",1),
   307.832,
   194.4,
   194.4,
@@ -85,7 +104,7 @@ function read_parameters()
   )
   cim=powerhouse(
   "CIM",
-  [7.6100000e+02,7.7300000e+02,7.7600000e+02,7.6300000e+02],
+  read_inflows("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/lsj-Original.dat",1),
   439.528,
   4594,
   3489.5,
@@ -98,7 +117,7 @@ function read_parameters()
   )
   csh=powerhouse(
   "CSH",
-  [0,0,0,0],
+  read_inflows("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/sh.dat",1),
   1232.96,
   79.8,
   79.8,
@@ -112,7 +131,10 @@ function read_parameters()
 end
 
 function create_optimization_model()
-  periods=[0,1,2,3,4]
+  periods=[]
+  for i in 0:30
+    push!(periods,i)
+  end
   power_plants=read_parameters()
 
   #model = Model(()->Xpress.Optimizer(DEFAULTALG=2, PRESOLVE=0, logfile = "output.log"))
@@ -179,9 +201,9 @@ function create_optimization_model()
   println("the total produced energy is : ", JuMP.objective_value(model), "MWh")
   for i in 1:size(power_plants)[1]
     println(power_plants[i].name)
-    println("period \t\t reservoir \t\t\t discharge \t\t\t spillway \t\t\t inflows")
+    println("period \t\t power \t\t\t\t reservoir \t\t\t\t discharge \t\t\t\t spillway \t\t\t inflows")
     for t in 2:size(periods)[1]
-      println(t,  "\t\t\t",JuMP.value(reservoir_volume[i,t]), "\t\t\t", JuMP.value(discharge_water[i,t]), "\t\t\t", JuMP.value(spillway_water[i,t]), "\t\t\t", power_plants[i].inflows[t-1])
+      println(t-1,  "\t\t\t",JuMP.value(production[i,t]), "\t\t\t",JuMP.value(reservoir_volume[i,t]), "\t\t\t", JuMP.value(discharge_water[i,t]), "\t\t\t", JuMP.value(spillway_water[i,t]), "\t\t\t", power_plants[i].inflows[t-1])
     end
 
   end
