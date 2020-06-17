@@ -201,9 +201,13 @@ function create_optimization_model()
   println("the total produced energy is : ", JuMP.objective_value(model), "MWh")
   for i in 1:size(power_plants)[1]
     println(power_plants[i].name)
-    println("period \t\t power \t\t\t\t reservoir \t\t\t\t discharge \t\t\t\t spillway \t\t\t inflows")
+    println("period \t\t power \t\t\t\t reservoir \t\t\t discharge \t\t\t spillway \t\t\t inflows")
     for t in 2:size(periods)[1]
-      println(t-1,  "\t\t\t",JuMP.value(production[i,t]), "\t\t\t",JuMP.value(reservoir_volume[i,t]), "\t\t\t", JuMP.value(discharge_water[i,t]), "\t\t\t", JuMP.value(spillway_water[i,t]), "\t\t\t", power_plants[i].inflows[t-1])
+      println(t-1,  "\t\t",round(JuMP.value(production[i,t]),sigdigits=8),
+      "\t\t\t\t",round(JuMP.value(reservoir_volume[i,t]),sigdigits=8),
+       "\t\t\t", round(JuMP.value(discharge_water[i,t]),sigdigits=8),
+        "\t\t\t", round(JuMP.value(spillway_water[i,t]),sigdigits=8),
+        "\t\t\t", round(power_plants[i].inflows[t-1],sigdigits=8))
     end
 
   end
