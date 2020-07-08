@@ -29,7 +29,15 @@ mutable struct powerhouse
   max_discharge_flow::Float64
   upstream_power_houses::Array
   hyperplanes::Array
-
+  usable_turbines_number::Array
+  minTurbines::Int8
+  maxTurbines::Int8
+end
+mutable struct maintenance
+  power_house_index::Int8
+  duration::Int8
+  earliest_start::Int8
+  latest_start::Int8
 end
 
 #this function is reading the production function hyperplanes from a textfile
@@ -91,47 +99,24 @@ function read_parameters()
   read_hyperplanes("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/fineHyperPlanes3/CCD.3.txt"),
   read_hyperplanes("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/fineHyperPlanes3/CCD.4.txt"),
   read_hyperplanes("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/fineHyperPlanes3/CCD.5.txt")
-  ]
+  ],
+  [3,4,5],
+  3,
+  5
   )
-  ccs=powerhouse(
-  "CCS",
-  read_inflows("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/cs-Original.dat",1),
-  307.832,
-  194.4,
-  194.4,
-  194.4,
-  1097.19,
-  1037.19,
-  [ccd],
-  read_hyperplanes("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/fineHyperPlanes1/CCS.5.txt")
 
-  )
-  cim=powerhouse(
-  "CIM",
-  read_inflows("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/lsj-Original.dat",1),
-  439.528,
-  4594,
-  3489.5,
-  4726.4,
-  1495.3,
-  1495.3,
-  [ccs],
-  read_hyperplanes("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/fineHyperPlanes1/CIM.12.txt")
-
-  )
-  csh=powerhouse(
-  "CSH",
-  read_inflows("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/sh.dat",1),
-  1232.96,
-  79.8,
-  79.8,
-  79.8,
-  2600.27,
-  2600.27,
-  [cim],
-  read_hyperplanes("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/fineHyperPlanes1/CSH.17.txt")
-  )
   return [ccd]
+
+end
+
+function read_maintenances()
+  maintenances=[]
+   push!(maintenances,maintenance(1,1,5,8))
+   push!(maintenances,maintenance(1,26,1,4))
+   push!(maintenances,maintenance(1,6,5,9))
+   push!(maintenances,maintenance(1,3,5,9))
+
+  return maintenances
 end
 
 function create_optimization_model()
@@ -140,6 +125,7 @@ function create_optimization_model()
     push!(periods,i)
   end
   power_plants=read_parameters()
+  maintenances=read_maintenances()
 
   #model = Model(()->Xpress.Optimizer(DEFAULTALG=2, PRESOLVE=0, logfile = "output.log"))
   model = Model(()->GLPK.Optimizer(tm_lim= 60000, msg_lev=GLPK.MSG_OFF))
@@ -151,7 +137,16 @@ function create_optimization_model()
   @variable(model, reservoir_volume[1:size(power_plants)[1],1:size(periods)[1]]>=0)
   #Production instantannée d'électricité
   @variable(model, production[1:size(power_plants)[1],1:size(periods)[1]]>=0)
-  #TODO
+  #Number of maintenances sheduled at the powerhouse i and period t
+  @variable(model, maintenance_number[1:size(power_plants)[1],1:size(periods)[1]]>=0,Int)
+  #Binary variable to define if a maintenance task m is starting at the period t
+  @variable(model, start_maintenance[1:size(maintenances)[1],1:size(periods)[1]],Bin)
+  #binary variable. 1 if k turbines are actives at the period t in the powerhouse i
+  @variable(model, number_of_active_turbinesCCD[
+  1:size(power_plants)[1],
+  1:size(periods)[1],
+  power_plants[1].minTurbines:power_plants[1].maxTurbines],Bin)
+
   @objective(model, Max,
     sum(sum(production[i,t]*24 for i in 1:size(power_plants)[1]) for t in 1:size(periods)[1])
    )
@@ -188,9 +183,9 @@ function create_optimization_model()
   for i in 1 : size(power_plants)[1]
     for t in 2:size(periods)[1]
       for k in 3:5
-        for h in power_plants[i].hyperplanes[3]
+        for h in power_plants[i].hyperplanes[k]
           #h=power_plants[i].hyperplanes[1]
-          @constraint(model, production[i,t]<=h.z+h.x*discharge_water[i,t]+h.y*reservoir_volume[i,t])
+          @constraint(model, production[i,t]<=h.z+h.x*discharge_water[i,t]+h.y*reservoir_volume[i,t]+(1-number_of_active_turbinesCCD[i,t,k])*200)
         end
       end
     end
@@ -201,6 +196,58 @@ function create_optimization_model()
     fix(spillway_water[i,1], 0; force = true)
     fix(reservoir_volume[i,1], power_plants[i].stored_water; force = true)
   end
+  #maintenances : forcing all maintenances to start !
+  for m in 1:size(maintenances)[1]
+    @constraint(model, sum(start_maintenance[m,t] for t in 2:size(periods)[1]
+    if (maintenances[m].earliest_start<=t && maintenances[m].latest_start>=t ))==1)
+  end
+  # maintenance : defining the number of maintenances
+   for i in 1:size(power_plants)[1]
+     #tp is used for hacking the t-1 because array in julia starts at 1
+     #and the 0 period is not used in the optimization model
+     for t in 2:size(periods)[1]
+       total_outage=@expression(model, 0)
+       for m in 1:size(maintenances)[1]
+         if maintenances[m].power_house_index==i
+           for tt in t-maintenances[m].duration+1:t
+             if (tt>=0
+               && (tt<size(periods)[1]-maintenances[m].duration+1)
+               && tt>=maintenances[m].earliest_start
+               && tt<=maintenances[m].latest_start)
+               #building the sum of outages for the period t
+               total_outage+=start_maintenance[m,tt]
+             end
+           end
+         end
+       end
+       @constraint(model,total_outage==maintenance_number[i,t])
+       # @constraint(model, sum(start_maintenance[m,tt]
+       # for m in 1:size(maintenances)[1] if maintenances[m].power_house_index==i
+       #  for tt in 1:size(periods)[1]
+       #   if ((maintenances[m].earliest_start<=t
+       #     && maintenances[m].latest_start>=t
+       #     && ((t-maintenances[m].duration+1)<=tt<=t)))
+       #      )
+       #   ==maintenance_number[i,t])
+     end
+   end
+
+   #bounds maintenance number
+   for i in 1:size(power_plants)[1]
+     for t in 2:size(periods)[1]
+       @constraint(model, maintenance_number[i,t]<=3)
+       @constraint(model, maintenance_number[i,t]>=0)
+     end
+     @constraint(model, maintenance_number[i,1]==0)
+   end
+
+   #mapping maintenance number to active turbines number
+   for i in 1:size(power_plants)[1]
+     for t in 2:size(periods)[1]
+       @constraint(model, maintenance_number[i,t]+sum(k*number_of_active_turbinesCCD[i,t,k] for k in power_plants[i].usable_turbines_number)==5)
+       #@constraint(model, sum(number_of_active_turbinesCCD[i,t,k] for k in power_plants[i].usable_turbines_number)=1)
+     end
+   end
 
   # Solve problem using MIP solver
   JuMP.optimize!(model)
@@ -209,11 +256,19 @@ function create_optimization_model()
     println(power_plants[i].name)
     println("period \t\t power \t\t\t\t reservoir \t\t\t discharge \t\t\t spillway \t\t\t inflows")
     for t in 2:size(periods)[1]
-      println(t-1,  "\t\t",round(JuMP.value(production[i,t]),sigdigits=8),
+      print(t-1,  "\t\t",round(JuMP.value(production[i,t]),sigdigits=8),
       "\t\t\t\t",round(JuMP.value(reservoir_volume[i,t]),sigdigits=8),
        "\t\t\t", round(JuMP.value(discharge_water[i,t]),sigdigits=8),
         "\t\t\t", round(JuMP.value(spillway_water[i,t]),sigdigits=8),
-        "\t\t\t", round(power_plants[i].inflows[t-1],sigdigits=8))
+        "\t\t\t", round(power_plants[i].inflows[t-1],sigdigits=8),
+        "\t\t\t nombre de maintenances", JuMP.value(maintenance_number[i,t]))
+        for m in 1:size(maintenances)[1]
+          if JuMP.value(start_maintenance[m,t])==1
+            print("\t\t\tStarting maintenance ", m)
+          end
+        end
+        println()
+
     end
 
   end
