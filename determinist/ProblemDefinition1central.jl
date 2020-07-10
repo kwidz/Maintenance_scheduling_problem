@@ -140,7 +140,6 @@ function create_optimization_model()
   #Binary variable to define if a maintenance task m is starting at the period t
   @variable(model, start_maintenance[1:size(maintenances)[1],1:size(periods)[1]],Bin)
   #binary variable. 1 if k turbines are actives at the period t in the powerhouse i
-  @variable(model, test[1:2,1:3,3:5], Bin)
   @variable(model, number_of_active_turbinesCCD[
   1:size(power_plants)[1],
   1:size(periods)[1],
@@ -222,8 +221,8 @@ function create_optimization_model()
    #bounds maintenance number
    for i in 1:size(power_plants)[1]
      for t in 1:size(periods)[1]
-       #@constraint(model, maintenance_number[i,t]<=3)
-       #@constraint(model, maintenance_number[i,t]>=0)
+       #@constraint(model, maintenance_number[i,t]<=power_plants[i].maxTurbines)
+       #@constraint(model, maintenance_number[i,t]>=power_plants[i].minTurbines)
      end
    end
    #mapping maintenance number to active turbines number
