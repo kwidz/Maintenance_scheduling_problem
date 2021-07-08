@@ -1,4 +1,5 @@
-using JuMP, Xpress
+#using JuMP, Xpress
+using JuMP, GLPK, BenchmarkTools
 
 
 #an hyperplane is made for Calculating the power fuction of a powerhouse
@@ -32,6 +33,7 @@ mutable struct powerhouse
   usable_turbines_number::Array
   minTurbines::Int8
   maxTurbines::Int8
+  powerReductionPeroutages::Array
 end
 mutable struct maintenance
   power_house_index::Int8
@@ -63,14 +65,22 @@ end
 #this function is reading a 30 days inflow scenario
 #in the red file, there is 62 scenario, instance is an integer who is selectingm
 #the good inflow scenario.
-function read_inflows(path, instance=1)
+function read_inflows(path, instance=1, scenario_number=1)
   inflows=[]
+  for i in 0:scenario_number-1
+    println("boucled ", i)
+    push!(inflows,[])
+  end
+  println(inflows)
   firstline=true
   open(path) do file
     for ln in eachline(file)
       if !firstline
         inflow=SubString.(ln, findall(r"\S+",ln))
-        push!(inflows,parse(Float64,inflow[1]))
+
+        for i in 1:scenario_number
+          push!(inflows[i],parse(Float64,inflow[instance+(i-1)*62]))
+        end
       else
         firstline=false
       end
@@ -84,10 +94,10 @@ end
 #TODO create a function to read all parameters in a json file insted of type them
 #by hand here so next users will not have to opend and changes things in this code !
 
-function read_parameters()
+function read_parameters(scenario_number)
   ccd=powerhouse(
   "CCD",
-  read_inflows("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/cd-Original.dat",1),
+  read_inflows("/home/kwidz/Doctorat/Maintenance_scheduling_problem/stochastic/Stochastic Maintenance data/inflows/cd.dat",1, scenario_number),
   199.715,
   380.5,
   353.8,
@@ -102,11 +112,13 @@ function read_parameters()
   ],
   [3,4,5],
   3,
-  5
+  5,
+  [30,15,0]
+
   )
   ccs=powerhouse(
   "CCS",
-  read_inflows("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/cs-Original.dat",1),
+  read_inflows("/home/kwidz/Doctorat/Maintenance_scheduling_problem/stochastic/Stochastic Maintenance data/inflows/cs.dat",1, scenario_number),
   307.832,
   194.4,
   194.4,
@@ -121,11 +133,12 @@ function read_parameters()
   ],
   [3,4,5],
   3,
-  5
+  5,
+  [-100,-50,0]
   )
   cim=powerhouse(
   "CIM",
-  read_inflows("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/lsj-Original.dat",1),
+  read_inflows("/home/kwidz/Doctorat/Maintenance_scheduling_problem/stochastic/Stochastic Maintenance data/inflows/lsj.dat",1, scenario_number),
   439.528,
   4594,
   3489.5,
@@ -140,11 +153,12 @@ function read_parameters()
   ],
   [10,11,12],
   10,
-  12
+  12,
+  [-25,0,16]
   )
   csh=powerhouse(
   "CSH",
-  read_inflows("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/sh.dat",1),
+  read_inflows("/home/kwidz/Doctorat/Maintenance_scheduling_problem/stochastic/Stochastic Maintenance data/inflows/sh.dat",1, scenario_number),
   1232.96,
   79.8,
   79.8,
@@ -159,9 +173,10 @@ function read_parameters()
   read_hyperplanes("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/fineHyperPlanes2/CSH.16.txt"),
   read_hyperplanes("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/fineHyperPlanes2/CSH.17.txt")
   ],
-  [13,14,15,16,17],
-  13,
-  17
+  [14,15,16,17],
+  14,
+  17,
+  [-50,0,50,90]
   )
   return [ccd,ccs,cim, csh]
 
@@ -196,23 +211,24 @@ function read_maintenances(path)
 end
 
 function create_optimization_model()
+  scenario_number=40
   periods=[]
-  for i in 0:30
+  for i in 0:29
     push!(periods,i)
   end
-  power_plants=read_parameters()
-  maintenances=read_maintenances("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/sched_18.txt")
-  Xpress.Optimizer(OUTPUTLOG = 1)
-  model = Model(()->Xpress.Optimizer(DEFAULTALG=2, PRESOLVE=1, logfile = "output.log"))
-  #model = Model(()->GLPK.Optimizer(tm_lim= 60000, msg_lev=GLPK.MSG_OFF))
+  power_plants=read_parameters(scenario_number)
+  maintenances=read_maintenances("/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/sched_3.txt")
+  #Xpress.Optimizer(OUTPUTLOG = 1)
+  #model = Model(()->Xpress.Optimizer(DEFAULTALG=2, PRESOLVE=1, logfile = "output.log"))
+  model = Model(()->GLPK.Optimizer(tm_lim= 800000, msg_lev=GLPK.MSG_OFF))
   #variables defining the discharged water at the powerhouse i and period t in m3/s
-  @variable(model, discharge_water[1:size(power_plants)[1],1:size(periods)[1]]>=0)
+  @variable(model, discharge_water[1:size(power_plants)[1],1:size(periods)[1], 1:scenario_number]>=0)
   #variable defining the spillway water at the powerhouse i and period t in m3/s
-  @variable(model, spillway_water[1:size(power_plants)[1],1:size(periods)[1]]>=0)
+  @variable(model, spillway_water[1:size(power_plants)[1],1:size(periods)[1], 1:scenario_number]>=0)
   #variable defining the reservoir volume at the powerhouse i and period t in hm3
-  @variable(model, reservoir_volume[1:size(power_plants)[1],1:size(periods)[1]]>=0)
+  @variable(model, reservoir_volume[1:size(power_plants)[1],1:size(periods)[1], 1:scenario_number]>=0)
   #Production instantannée d'électricité
-  @variable(model, production[1:size(power_plants)[1],1:size(periods)[1]]>=0)
+  @variable(model, production[1:size(power_plants)[1],1:size(periods)[1], 1:scenario_number]>=0)
   #Number of maintenances sheduled at the powerhouse i and period t
   @variable(model, maintenance_number[1:size(power_plants)[1],1:size(periods)[1]]>=0,Int)
   #Binary variable to define if a maintenance task m is starting at the period t
@@ -301,19 +317,21 @@ function create_optimization_model()
 
   @objective(model, Max,
   #*1.92 is for 24 hours times 80$ per Megawat / 1000 so the objective will be in K$
-  sum(sum(production[i,t]*1.92 for i in 1:size(power_plants)[1]) for t in 1:size(periods)[1])
+  sum(sum(sum(1/scenario_number*production[i,t,w]*1.92 for w in 1:scenario_number) for i in 1:size(power_plants)[1]) for t in 1:size(periods)[1])
   )
 
   #upper bounds on discharge water, spillway flow and reservoir volumes
   for i in 1:size(power_plants)[1]
     for t in 1:size(periods)[1]
-      set_upper_bound(discharge_water[i,t], power_plants[i].max_discharge_flow)
-      set_upper_bound(spillway_water[i,t], power_plants[i].max_spillway_flow)
-      set_upper_bound(reservoir_volume[i,t], power_plants[i].max_storable_water)
-      set_lower_bound(reservoir_volume[i,t], power_plants[i].min_storable_water)
-      set_upper_bound(production[i,t], power_plants[i].maxPower)
-      @constraint(model,discharge_water[i,t]>= 0 )
-      @constraint(model,spillway_water[i,t]>= 0 )
+      for w in 1:scenario_number
+        set_upper_bound(discharge_water[i,t,w], power_plants[i].max_discharge_flow)
+        set_upper_bound(spillway_water[i,t,w], power_plants[i].max_spillway_flow)
+        set_upper_bound(reservoir_volume[i,t,w], power_plants[i].max_storable_water)
+        set_lower_bound(reservoir_volume[i,t,w], power_plants[i].min_storable_water)
+        set_upper_bound(production[i,t,w], power_plants[i].maxPower)
+        @constraint(model,discharge_water[i,t,w]>= 0 )
+        @constraint(model,spillway_water[i,t,w]>= 0 )
+      end
     end
   end
   # Water balance constraints
@@ -321,62 +339,102 @@ function create_optimization_model()
     for t in 2:size(periods)[1]
       #t-1 is the current period,indeed we are starting at 2 because the
       #first period is used to emulate the -1 period for the real first period
+      #TODO inflows
       if i == 1
-        @constraint(model, reservoir_volume[i,t]==reservoir_volume[i,t-1]
-        +power_plants[i].inflows[t-1]*(0.086400)
-        -discharge_water[i,t]*(0.086400)-spillway_water[i,t]*(0.086400))
+        for w in 1:scenario_number
+          @constraint(model, reservoir_volume[i,t,w]==reservoir_volume[i,t-1,w]
+          +power_plants[i].inflows[w][t-1]*(0.086400)
+          -discharge_water[i,t,w]*(0.086400)-spillway_water[i,t,w]*(0.086400))
+        end
       else
-        @constraint(model, reservoir_volume[i,t]==reservoir_volume[i,t-1]
-        +power_plants[i].inflows[t-1]*(0.086400)+discharge_water[i-1,t]*(0.086400)+spillway_water[i-1,t]*(0.086400)
-        -discharge_water[i,t]*(0.086400)-spillway_water[i,t]*(0.086400))
+        for w in 1:scenario_number
+          @constraint(model, reservoir_volume[i,t,w]==reservoir_volume[i,t-1,w]
+          +power_plants[i].inflows[w][t-1]*(0.086400)+discharge_water[i-1,t,w]*(0.086400)+spillway_water[i-1,t,w]*(0.086400)
+          -discharge_water[i,t,w]*(0.086400)-spillway_water[i,t,w]*(0.086400))
+        end
       end
     end
   end
   #hyperplanes constraints (production function)
   for i in 1 : size(power_plants)[1]
     for t in 2:size(periods)[1]
-      for k in power_plants[i].minTurbines:power_plants[i].maxTurbines
-        if (k>=power_plants[i].minTurbines && k<=power_plants[i].maxTurbines)
-          for h in power_plants[i].hyperplanes[k]
-            #h=power_plants[i].hyperplanes[1]
-            if i==1
-              if t in periods_optimizables_ccd
-                @constraint(model, production[i,t]<=h.z+h.x*discharge_water[i,t]+h.y*reservoir_volume[i,t]+(1-number_of_active_turbinesCCD[i,t,k])*200)
-              elseif k == power_plants[i].maxTurbines
-                @constraint(model, production[i,t]<=h.z+h.x*discharge_water[i,t]+h.y*reservoir_volume[i,t])
+      for h in power_plants[i].hyperplanes[power_plants[i].maxTurbines]
+        if(h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][1])
+        #h=power_plants[i].hyperplanes[1]
+        if i==1
+          for k in power_plants[i].minTurbines:power_plants[i].maxTurbines
+            if t in periods_optimizables_ccd
+              for w in 1:scenario_number
+                @constraint(model, production[i,t,w]<=h.z+h.x*discharge_water[i,t,w]+h.y*reservoir_volume[i,t,w]+(1-number_of_active_turbinesCCD[i,t,k])*200)
               end
-            end
-            if i==2
-              if t in periods_optimizables_ccs
-                @constraint(model, production[i,t]<=h.z+h.x*discharge_water[i,t]+h.y*reservoir_volume[i,t]+(1-number_of_active_turbinesCCS[i,t,k])*200)
-              elseif k == power_plants[i].maxTurbines
-                @constraint(model, production[i,t]<=h.z+h.x*discharge_water[i,t]+h.y*reservoir_volume[i,t])
-              end
-            end
-            if i==3
-              if t in periods_optimizables_cim
-                @constraint(model, production[i,t]<=h.z+h.x*discharge_water[i,t]+h.y*reservoir_volume[i,t]+(1-number_of_active_turbinesCIM[i,t,k])*200)
-              elseif k == power_plants[i].maxTurbines
-                @constraint(model, production[i,t]<=h.z+h.x*discharge_water[i,t]+h.y*reservoir_volume[i,t])
-              end
-            end
-            if i==4
-              if t in periods_optimizables_csh
-                @constraint(model, production[i,t]<=h.z+h.x*discharge_water[i,t]+h.y*reservoir_volume[i,t]+(1-number_of_active_turbinesCSH[i,t,k])*200)
-              elseif k == power_plants[i].maxTurbines
-                @constraint(model, production[i,t]<=h.z+h.x*discharge_water[i,t]+h.y*reservoir_volume[i,t])
+            elseif k == power_plants[i].maxTurbines
+              for w in 1:scenario_number
+                if(h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][1]||h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][20])
+                  @constraint(model, production[i,t,w]<=h.z+h.x*discharge_water[i,t,w]+h.y*reservoir_volume[i,t,w])
+                end
               end
             end
           end
         end
+        if i==2
+          if t in periods_optimizables_ccs
+            for w in 1:scenario_number
+              @constraint(model, production[i,t,w]<=h.z+h.x*discharge_water[i,t,w]+h.y*reservoir_volume[i,t,w]+
+              sum(number_of_active_turbinesCCS[i,t,k]*power_plants[i].powerReductionPeroutages[k-power_plants[i].minTurbines+1] for k in power_plants[i].minTurbines:power_plants[i].maxTurbines)+(1-number_of_active_turbinesCCS[i,t,k])*200)
+            end
+          else
+            for w in 1:scenario_number
+              if(h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][1]||h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][20])
+                @constraint(model, production[i,t,w]<=h.z+h.x*discharge_water[i,t,w]+h.y*reservoir_volume[i,t,w])
+              end
+          end
+          end
+        end
+        if i==3
+          if t in periods_optimizables_cim
+            for w in 1:scenario_number
+              @constraint(model, production[i,t,w]<=h.z+h.x*discharge_water[i,t,w]+h.y*reservoir_volume[i,t,w]+
+              sum(number_of_active_turbinesCIM[i,t,k]*power_plants[i].powerReductionPeroutages[k-power_plants[i].minTurbines+1] for k in power_plants[i].minTurbines:power_plants[i].maxTurbines)+(1-number_of_active_turbinesCIM[i,t,k])*200)
+            end
+          else
+            for w in 1:scenario_number
+              if(h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][1]||h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][20])
+                @constraint(model, production[i,t,w]<=h.z+h.x*discharge_water[i,t,w]+h.y*reservoir_volume[i,t,w])
+              end
+          end
+
+          end
+        end
+        if i==4
+          if t in periods_optimizables_csh
+            for w in 1:scenario_number
+              @constraint(model, production[i,t,w]<=(h.z+h.x*discharge_water[i,t,w]+h.y*reservoir_volume[i,t,w])+
+              sum(number_of_active_turbinesCSH[i,t,k]*power_plants[i].powerReductionPeroutages[k-power_plants[i].minTurbines+1] for k in power_plants[i].minTurbines:power_plants[i].maxTurbines)+(1-number_of_active_turbinesCSH[i,t,k])*200)
+            end
+          else
+            for w in 1:scenario_number
+
+              if(h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][1]||h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][20])
+                @constraint(model, production[i,t,w]<=h.z+h.x*discharge_water[i,t,w]+h.y*reservoir_volume[i,t,w])
+                println("here we go")
+                println(h)
+              end
+          end
+
+end
+          end
+        end
       end
+
     end
   end
   #fixing reservoir volume, spillway and discharge at the period -1
   for i in 1:size(power_plants)[1]
-    fix(discharge_water[i,1], 0; force = true)
-    fix(spillway_water[i,1], 0; force = true)
-    fix(reservoir_volume[i,1], power_plants[i].stored_water; force = true)
+    for w in 1:scenario_number
+      fix(discharge_water[i,1,w], 0; force = true)
+      fix(spillway_water[i,1,w], 0; force = true)
+      fix(reservoir_volume[i,1,w], power_plants[i].stored_water; force = true)
+    end
   end
   #maintenances bounding the variable for number of groups to 0 if there isn't enough group in the central i
   # for i in 1:size(power_plants)[1]
@@ -456,18 +514,21 @@ function create_optimization_model()
 
     # Solve problem using MIP solver
     println("starting optimization...")
+    start = time()
     JuMP.optimize!(model)
+    elapsed = time() - start
+    println("temps de résolution : ",elapsed)
     println(JuMP.termination_status(model))
     println("the total produced energy is : ", JuMP.objective_value(model), "MWh")
     for i in 1:size(power_plants)[1]
       println(power_plants[i].name)
       println("period \t power \t\t reservoir \t\t discharge \t\t spillway \t\t inflows")
       for t in 2:size(periods)[1]
-        print(t-1,  "\t\t",round(JuMP.value(production[i,t]),sigdigits=8),
-        "\t\t\t",round(JuMP.value(reservoir_volume[i,t]),sigdigits=8),
-        "\t", round(JuMP.value(discharge_water[i,t]),sigdigits=8),
-        "\t", round(JuMP.value(spillway_water[i,t]),sigdigits=8),
-        "\t", round(power_plants[i].inflows[t-1],sigdigits=8),
+        print(t-1,  "\t\t",round(JuMP.value(production[i,t,1]),sigdigits=8),
+        "\t\t\t",round(JuMP.value(reservoir_volume[i,t,1]),sigdigits=8),
+        "\t", round(JuMP.value(discharge_water[i,t,1]),sigdigits=8),
+        "\t", round(JuMP.value(spillway_water[i,t,1]),sigdigits=8),
+        "\t", round(power_plants[i].inflows[1][t-1],sigdigits=8),
         "\tnombre de maintenances :", JuMP.value(maintenance_number[i,t]))
         for m in 1:size(maintenances)[1]
           if JuMP.value(start_maintenance[m,t])==1 && maintenances[m].power_house_index==i

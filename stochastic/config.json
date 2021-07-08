@@ -1,0 +1,79 @@
+{
+"globalParameters":
+    {
+    "hyperplanesFolder":"/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/fineHyperPlanes2/",
+    "inflowsFolder":"/home/kwidz/Doctorat/Maintenance_scheduling_problem/stochastic/Stochastic Maintenance data/inflows/",
+    "savingResultsFolder":"/home/kwidz/Doctorat/Maintenance_scheduling_problem/stochastic/results/",
+    "maintenancesScenarios":"/home/kwidz/Doctorat/ProjetMaintenanceTurbines/Projet Jesus/ModelSelection/data/sched_",
+    "scenarioNumber":40
+    },
+    
+    "CCD":
+        {
+        "name":"CCD",
+        "inflows":"cd.dat",
+        "maxPower":199.715,
+        "stored_water":365.5,
+        "min_storable_water":353.8,
+        "max_storable_water":385,
+        "max_spillway_flow":825.477,
+        "max_discharge_flow":825.477,
+        "upstream_power_houses":[],
+        "hyperplanes":["","","CCD.3.txt","CCD.4.txt","CCD.5.txt"],
+        "usable_turbines_number":[3,4,5],
+        "minTurbines":3,
+        "maxTurbines":5,
+        "powerReductionPeroutages":[30,15,0]
+        },
+    "CCS":
+        {
+        "name":"CCD",
+        "inflows":"cs.dat",
+        "maxPower":307.832,
+        "stored_water":194.4,
+        "min_storable_water":194.4,
+        "max_storable_water":194.4,
+        "max_spillway_flow":1097.19,
+        "max_discharge_flow":1037.19,
+        "upstream_power_houses":["ccd"],
+        "hyperplanes":["","","CCS.3.txt","CCS.4.txt","CCS.5.txt"],
+        "usable_turbines_number":[3,4,5],
+        "minTurbines":3,
+        "maxTurbines":5,
+        "powerReductionPeroutages":[-100,-50,0]
+        },
+    "CIM":
+        {
+        "name":"CCD",
+        "inflows":"lsj.dat",
+        "maxPower":439.528,
+        "stored_water":4194,
+        "min_storable_water":3489.5,
+        "max_storable_water":4726.4,
+        "max_spillway_flow":1495.3,
+        "max_discharge_flow":1495.3,
+        "upstream_power_houses":["ccs"],
+        "hyperplanes":["","","","","","","","","","CIM.10.txt","CIM.11.txt","CIM.12.txt"],
+        "usable_turbines_number":[10,11,12],
+        "minTurbines":10,
+        "maxTurbines":12,
+        "powerReductionPeroutages":[-25,0,16]
+        },
+    "CSH":
+        {
+        "name":"CCD",
+        "inflows":"sh.dat",
+        "maxPower":1232.96,
+        "stored_water":79.8,
+        "min_storable_water":79.8,
+        "max_storable_water":79.8,
+        "max_spillway_flow":2600.27,
+        "max_discharge_flow":2600.27,
+        "upstream_power_houses":["cim"],
+        "hyperplanes":["","","","","","","","","","","","","CSH.13.txt","CSH.14.txt","CSH.15.txt","CSH.16.txt","CSH.17.txt"],
+        "usable_turbines_number":[14,15,16,17],
+        "minTurbines":14,
+        "maxTurbines":17,
+        "powerReductionPeroutages":[-50,0,50,90]
+        }
+}
