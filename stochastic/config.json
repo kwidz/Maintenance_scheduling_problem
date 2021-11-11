@@ -27,7 +27,7 @@
         },
     "CCS":
         {
-        "name":"CCD",
+        "name":"CCS",
         "inflows":"cs.dat",
         "maxPower":307.832,
         "stored_water":194.4,
@@ -44,7 +44,7 @@
         },
     "CIM":
         {
-        "name":"CCD",
+        "name":"CIM",
         "inflows":"lsj.dat",
         "maxPower":439.528,
         "stored_water":4194,
@@ -61,7 +61,7 @@
         },
     "CSH":
         {
-        "name":"CCD",
+        "name":"CSH",
         "inflows":"sh.dat",
         "maxPower":1232.96,
         "stored_water":79.8,

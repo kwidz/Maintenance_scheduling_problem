@@ -1,5 +1,5 @@
 #using JuMP, Xpress
-using JuMP, GLPK, BenchmarkTools, Plots, JSON
+using JuMP, GLPK, BenchmarkTools, Plots, JSON, CSV, DataFrames
 
 #an hyperplane is made for Calculating the power fuction of a powerhouse
 # z is a coefficient for this hyper plane
@@ -92,6 +92,8 @@ end
 #by hand here so next users will not have to opend and changes things in this code !
 
 function read_parameters(scenario_number, config)
+
+
   ccd=powerhouse(
   config["CCD"]["name"],
   read_inflows(string(config["globalParameters"]["inflowsFolder"],config["CCD"]["inflows"]),1, scenario_number),
@@ -152,8 +154,8 @@ function read_parameters(scenario_number, config)
   config["CIM"]["minTurbines"],
   config["CIM"]["maxTurbines"],
   config["CIM"]["powerReductionPeroutages"]
-  
-  
+
+
   )
   csh=powerhouse(
   config["CSH"]["name"],
@@ -203,11 +205,130 @@ function read_maintenances(config)
         c=parse(Float64,m[:c])+2
         d=parse(Float64,m[:d])+2
         push!(maintenances,maintenance(a,b,c,d))
-        
+
       end
     end
   end
   return maintenances
+end
+
+function productionCCD(maintenances_number, debit, hauteurChute)
+  x=debit
+  y=hauteurChute
+  if (maintenances_number==0)
+    return -7.252 + 0.2618*x + 0.02046*y + 4.368e-05*x^2 + -4.188e-05*x*y + -1.486e-07*x^3 + 1.875e-07*x^2*y
+  end
+  if (maintenances_number==1)
+    return -4.168 + 0.2293*x + 0.01374*y + 0.000258*x^2 + 4.642e-05*x*y + -4.039e-07*x^3 +  9.318e-08*x^2*y
+  end
+  if (maintenances_number==2)
+    return -2.813 + 0.1548*x + 0.009278*y + 0.0001741*x^2 + 3.133e-05*x*y + -2.726e-07*x^3 + 6.289e-08*x^2*y
+  end
+end
+
+function productionCCS(maintenances_number, debit, hauteurChute)
+  x=debit
+  y=hauteurChute
+  if (maintenances_number==0)
+    p00 =      -6.224
+    p10 =      0.3289
+    p01 =     0.07608
+    p20 =  -2.581e-18
+    p11 =  -1.108e-17
+    p30 =  -1.305e-22
+    p21 =   8.713e-21
+  else
+    p00 = -7.121
+    p10 =      0.3266
+    p01 =     0.07497
+    p20 =   0.0001312
+    p11 =  -1.854e-05
+    p30 =  -2.675e-07
+    p21 =   7.417e-08
+  end
+  return p00 + p10*x + p01*y + p20*x^2 + p11*x*y + p30*x^3 + p21*x^2*y
+end
+
+function productionCIM(maintenances_number, debit, hauteurChute)
+  x=debit
+  y=hauteurChute
+  if (maintenances_number==0)
+    p00 =      -18.63
+    p10 =      0.3127
+    p01 =   -0.002286
+    p20 =  -0.0001115
+    p11 =    4.62e-05
+    p30 =   2.891e-08
+    p21 =  -1.309e-08
+
+  elseif(maintenances_number==1)
+    p00 =      -16.02
+    p10 =      0.2838
+    p01 =   -0.002927
+    p20 =  -4.855e-05
+    p11 =   4.744e-05
+    p30 =  -8.311e-09
+    p21 =  -1.123e-08
+
+  else
+    p00 =      -14.47
+    p10 =      0.2649
+    p01 =   -0.003476
+    p20 =   1.136e-06
+    p11 =   4.885e-05
+    p30 =  -4.332e-08
+    p21 =  -9.657e-09
+  end
+  return p00 + p10*x + p01*y + p20*x^2 + p11*x*y + p30*x^3 + p21*x^2*y
+end
+function productionCSH(maintenances_number, debit, hauteurChute)
+  x=debit
+  y=hauteurChute
+  if (maintenances_number==0)
+    p00 =       46.89
+    p10 =      0.1918
+    p01 =       1.606
+    p20 =   0.0004516
+    p11 =    -0.00274
+    p02 =    0.003668
+    p30 =  -1.515e-07
+    p21 =   1.157e-06
+    p12 =  -2.142e-06
+
+  elseif(maintenances_number==1)
+    p00 =        1050
+    p10 =       -1.46
+    p01 =       1.868
+    p20 =    0.001336
+    p11 =   -0.002873
+    p02 =    0.003198
+    p30 =  -3.039e-07
+    p21 =   1.141e-06
+    p12 =  -1.874e-06
+
+  elseif(maintenances_number==2)
+    p00 =        1913
+    p10 =      -3.266
+    p01 =       4.051
+    p20 =    0.002424
+    p11 =   -0.004118
+    p02 =  -1.405e-13
+    p30 =  -4.957e-07
+    p21 =   1.121e-06
+    p12 =   6.798e-17
+
+  else
+    p00 =        2040
+    p10 =      -3.106
+    p01 =       1.732
+    p20 =    0.002183
+    p11 =   -0.001854
+    p02 =   0.0002336
+    p30 =   -4.44e-07
+    p21 =   6.727e-07
+    p12 =  -3.118e-07
+  end
+  return p00 + p10*x + p01*y + p20*x^2 + p11*x*y + p30*x^3 + p21*x^2*y+ p12*x*y^2
 end
 
 function create_optimization_model()
@@ -330,6 +451,7 @@ function create_optimization_model()
         set_upper_bound(spillway_water[i,t,w], power_plants[i].max_spillway_flow)
         set_upper_bound(reservoir_volume[i,t,w], power_plants[i].max_storable_water)
         set_lower_bound(reservoir_volume[i,t,w], power_plants[i].min_storable_water)
+        set_lower_bound(production[1,t,w], 39)
         set_upper_bound(production[i,t,w], power_plants[i].maxPower)
         @constraint(model,discharge_water[i,t,w]>= 0 )
         @constraint(model,spillway_water[i,t,w]>= 0 )
@@ -342,19 +464,21 @@ function create_optimization_model()
       #t-1 is the current period,indeed we are starting at 2 because the
       #first period is used to emulate the -1 period for the real first period
       #TODO inflows
-      if i == 1
-        for w in 1:scenario_number
-          @constraint(model, reservoir_volume[i,t,w]==reservoir_volume[i,t-1,w]
-          +power_plants[i].inflows[w][t-1]*(0.086400)
-          -discharge_water[i,t,w]*(0.086400)-spillway_water[i,t,w]*(0.086400))
+      
+      
+        if i == 1
+            for w in 1:scenario_number
+            @constraint(model, reservoir_volume[i,t,w]==reservoir_volume[i,t-1,w]
+            +power_plants[i].inflows[w][t-1]*(0.086400)
+            -discharge_water[i,t,w]*(0.086400)-spillway_water[i,t,w]*(0.086400))
+            end
+        else
+            for w in 1:scenario_number
+            @constraint(model, reservoir_volume[i,t,w]==reservoir_volume[i,t-1,w]
+            +power_plants[i].inflows[w][t-1]*(0.086400)+discharge_water[i-1,t,w]*(0.086400)+spillway_water[i-1,t,w]*(0.086400)
+            -discharge_water[i,t,w]*(0.086400)-spillway_water[i,t,w]*(0.086400))
+            end
         end
-      else
-        for w in 1:scenario_number
-          @constraint(model, reservoir_volume[i,t,w]==reservoir_volume[i,t-1,w]
-          +power_plants[i].inflows[w][t-1]*(0.086400)+discharge_water[i-1,t,w]*(0.086400)+spillway_water[i-1,t,w]*(0.086400)
-          -discharge_water[i,t,w]*(0.086400)-spillway_water[i,t,w]*(0.086400))
-        end
-      end
     end
   end
   #hyperplanes constraints (production function)
@@ -417,7 +541,7 @@ function create_optimization_model()
   #fixing reservoir volume, spillway and discharge at the period -1
   for i in 1:size(power_plants)[1]
     for w in 1:scenario_number
-      fix(discharge_water[i,1,w], 0; force = true)
+      fix(discharge_water[i,1,w], power_plants[i].inflows[w][1] ; force = true)
       fix(spillway_water[i,1,w], 0; force = true)
       fix(reservoir_volume[i,1,w], power_plants[i].stored_water; force = true)
     end
@@ -503,7 +627,7 @@ function create_optimization_model()
     start = time()
     JuMP.optimize!(model)
     elapsed = time() - start
-    #println("temps de résolution : ",elapsed)
+    println("temps de résolution : ",elapsed)
     #println(JuMP.termination_status(model))
     #println("the total produced energy is : ", JuMP.objective_value(model), "MWh")
     gr()
@@ -520,34 +644,71 @@ function create_optimization_model()
             append!(maintenancesCIM,0)
             append!(maintenancesCSH,0)
         end
+        totalPower=0
+        totalPower=0
+        statsCCD=[[],[],[]]
+        statsCCS=[[],[],[]]
+        statsCIM=[[],[],[]]
+        statsCSH=[[],[],[]]
     for i in 1:size(power_plants)[1]
+      y=[[],[],[]]
       #println(power_plants[i].name)
       println("\n")
       println("period; power; reservoir; discharge; spillway; inflows")
       x=3:size(periods)[1]-1
-      y=[[],[],[]]
+      
       for t in 3:size(periods)[1]-1
-        append!(y[1], round(JuMP.value(reservoir_volume[i,t,1]),sigdigits=8))
-        append!(y[2],round(JuMP.value(discharge_water[i,t,1]),sigdigits=8))
-        append!(y[3],round(JuMP.value(production[i,t,1]),sigdigits=8))
-      end
-      plot(x,y[1],label="reservoir volume")
-      plot!(x,y[2],label="discharge_water")
-      plot!(x,y[3],label="production")
+        
+  
+        if(i==1)
+            volume_anonymised=round(JuMP.value(reservoir_volume[i,t,1]),sigdigits=8)
+            discharge_anonymised=round(JuMP.value(discharge_water[i,t,1]),sigdigits=8)*100/config["CCD"]["max_discharge_flow"]
+            production_anonymised=round(JuMP.value(production[i,t,1]),sigdigits=8)*100/config["CCD"]["maxPower"]
+        elseif(i==2)
+            volume_anonymised=round(JuMP.value(reservoir_volume[i,t,1]),sigdigits=8)*100/config["CCS"]["max_storable_water"]
+            discharge_anonymised=round(JuMP.value(discharge_water[i,t,1]),sigdigits=8)*100/config["CCS"]["max_discharge_flow"]
+            production_anonymised=round(JuMP.value(production[i,t,1]),sigdigits=8)*100/config["CCS"]["maxPower"]
+        elseif(i==3)
+            volume_anonymised=round(JuMP.value(reservoir_volume[i,t,1]),sigdigits=8)*100/config["CIM"]["max_storable_water"]
+            discharge_anonymised=round(JuMP.value(discharge_water[i,t,1]),sigdigits=8)*100/config["CIM"]["max_discharge_flow"]
+            production_anonymised=round(JuMP.value(production[i,t,1]),sigdigits=8)*100/config["CIM"]["maxPower"]
+        else(i==4)
+            volume_anonymised=round(JuMP.value(reservoir_volume[i,t,1]),sigdigits=8)*100/config["CSH"]["max_storable_water"]
+            discharge_anonymised=round(JuMP.value(discharge_water[i,t,1]),sigdigits=8)*100/config["CSH"]["max_discharge_flow"]
+            production_anonymised=round(JuMP.value(production[i,t,1]),sigdigits=8)*100/config["CSH"]["maxPower"]
+            end
+        append!(y[1], volume_anonymised)
+        append!(y[2],discharge_anonymised)
+        append!(y[3],production_anonymised)
+        if(i==1)
+          totalPower=totalPower+productionCCD(JuMP.value(maintenance_number[i,t]),JuMP.value(discharge_water[i,t,1]),JuMP.value(reservoir_volume[i,t,1]))
+        elseif(i==2)
+          totalPower=totalPower+productionCCS(JuMP.value(maintenance_number[i,t]),JuMP.value(discharge_water[i,t,1]),JuMP.value(reservoir_volume[i,t,1]))
+        elseif(i==3)
+          totalPower=totalPower+productionCIM(JuMP.value(maintenance_number[i,t]),JuMP.value(discharge_water[i,t,1]),JuMP.value(reservoir_volume[i,t,1]))
+        else
+          totalPower=totalPower+productionCSH(JuMP.value(maintenance_number[i,t]),JuMP.value(discharge_water[i,t,1]),JuMP.value(reservoir_volume[i,t,1]))
+        end
+      end      
+      
       if i== 1
-        savefig(string(config["globalParameters"]["savingResultsFolder"],ARGS[1],"/CCDWaterJesus.png"))
+        statsCCD=y
+        #savefig(string(config["globalParameters"]["savingResultsFolder"],ARGS[1],"/CCDWater.png"))
       end
       if i== 2
-        savefig(string(config["globalParameters"]["savingResultsFolder"],ARGS[1],"/CCSWaterJesus.png"))
+        statsCCS=y
+        #savefig(string(config["globalParameters"]["savingResultsFolder"],ARGS[1],"/CCSWater.png"))
       end
       if i== 3
-        savefig(string(config["globalParameters"]["savingResultsFolder"],ARGS[1],"/CIMWaterJesus.png"))
+        statsCIM=y
+        #savefig(string(config["globalParameters"]["savingResultsFolder"],ARGS[1],"/CIMWater.png"))
       end
       if i== 4
-        savefig(string(config["globalParameters"]["savingResultsFolder"],ARGS[1],"/CSHWaterJesus.png"))
+        statsCSH=y
+        #savefig(string(config["globalParameters"]["savingResultsFolder"],ARGS[1],"/CSHWater.png"))
       end
 
-        
+
       for t in 1:size(periods)[1]-1
         print(t-1,  ";",round(JuMP.value(production[i,t,1]),sigdigits=8),
         ";",round(JuMP.value(reservoir_volume[i,t,1]),sigdigits=8),
@@ -559,24 +720,24 @@ function create_optimization_model()
         for m in 1:size(maintenances)[1]
           if JuMP.value(start_maintenance[m,t])==1 && maintenances[m].power_house_index==i
             if(i==1)
-                for duree in 1:maintenances[m].duration
-                     maintenancesCCD[t+duree-1]=maintenancesCCD[t+duree-1]+1
-                end
+              for duree in 1:maintenances[m].duration
+                maintenancesCCD[t+duree-1]=maintenancesCCD[t+duree-1]+1
+              end
             end
             if(i==2)
-                for duree in 1:maintenances[m].duration
-                     maintenancesCCS[t+duree-1]=maintenancesCCS[t+duree-1]+1
-                end
+              for duree in 1:maintenances[m].duration
+                maintenancesCCS[t+duree-1]=maintenancesCCS[t+duree-1]+1
+              end
             end
             if(i==3)
-                for duree in 1:maintenances[m].duration
-                     maintenancesCIM[t+duree-1]=maintenancesCIM[t+duree-1]+1
-                end
+              for duree in 1:maintenances[m].duration
+                maintenancesCIM[t+duree-1]=maintenancesCIM[t+duree-1]+1
+              end
             end
             if(i==4)
-                for duree in 1:maintenances[m].duration
-                     maintenancesCSH[t+duree-1]=maintenancesCSH[t+duree-1]+1
-                end
+              for duree in 1:maintenances[m].duration
+                maintenancesCSH[t+duree-1]=maintenancesCSH[t+duree-1]+1
+              end
             end
           end
         end
@@ -592,14 +753,54 @@ function create_optimization_model()
       plot!(x,maintenancesCIM,label="Maintenances CIM", linetype="steppost")
       plot!(x,maintenancesCSH,label="Maintenances CSH", linetype="steppost")
       savefig(string(config["globalParameters"]["savingResultsFolder"],ARGS[1],"/MaintenancesJesus.png"))
-      
+      PowersFile =  open(string(config["globalParameters"]["savingResultsFolder"],"/PowersJesus.txt"),"a")
+
+      write(PowersFile, string(totalPower,","));
+      TimeFile =  open(string(config["globalParameters"]["savingResultsFolder"],"/TimeJesus.txt"),"a")
+
+      write(TimeFile, string(elapsed,","));
 
     end
+    #Reservoir volume
+     df = DataFrame(CCDReservoir = statsCCD[1], 
+               CCDdischarge = statsCCD[2],
+               CCDpower = statsCCD[3],
+               CCSReservoir = statsCCS[1], 
+               CCSdischarge = statsCCS[2],
+               CCSpower = statsCCS[3],
+               CIMReservoir = statsCIM[1], 
+               CIMdischarge =statsCIM[2],
+               CIMpower = statsCIM[3],
+               CSHReservoir = statsCSH[1], 
+               CSHdischarge =statsCSH[2],
+               CSHpower =statsCSH[3],
+               )
+               
+    CSV.write(string(config["globalParameters"]["savingResultsFolder"],ARGS[1],"/resultsJesus.csv"), df)
+    
+    plot(3:size(periods)[1]-1,[vec(statsCCD[1]),vec(statsCCS[1]),vec(statsCIM[1]),vec(statsCSH[1])], layout = 4, label=["" "" "" ""],
+    title=["power plant 1" "power plant 2" "power plant 3" "power plant 4"],xlabel="periods(days)", ylabel="reservoir height in %")
+    savefig(string(config["globalParameters"]["savingResultsFolder"],ARGS[1],"/ReservoirVolumeALLJesus.png"))
+    #Dischargre water
+    plot([vec(statsCCD[2]),vec(statsCCS[2]),vec(statsCIM[2]),vec(statsCSH[2])], layout = 4, label=["" "" "" ""],
+    title=["power plant 1" "power plant 2" "power plant 3" "power plant 4"],xlabel="periods(days)", ylabel="dischared water in % of max discharge flow")
+    savefig(string(config["globalParameters"]["savingResultsFolder"],ARGS[1],"/DischargedWaterALLJesus.png"))
+    #Production estimated
+    plot([vec(statsCCD[3]),vec(statsCCS[3]),vec(statsCIM[3]),vec(statsCSH[3])], layout = 4, label=["" "" "" ""],
+    title=["power plant 1" "power plant 2" "power plant 3" "power plant 4"],xlabel="periods(days)", ylabel="Instant power in %")
+    savefig(string(config["globalParameters"]["savingResultsFolder"],ARGS[1],"/EstimatedPowerALLJesus.png"))
+    #true Production
+    
+    
     #println(JuMP.termination_status(model))
     #println(JuMP.primal_status(model))
     #println(JuMP.objective_value(model))
 
 
   end
+    #println(JuMP.termination_status(model))
+    #println(JuMP.primal_status(model))
+    #println(JuMP.objective_value(model))
+
 
   create_optimization_model()
