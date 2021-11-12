@@ -500,9 +500,9 @@ function create_optimization_model()
               end
             elseif k == power_plants[i].maxTurbines
               for w in 1:scenario_number
-                if(h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][1]||h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][25]||h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][15]||h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][5])
+                #if(h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][1]||h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][25]||h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][15]||h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][5]||h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][10]||h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][7]||h==power_plants[i].hyperplanes[power_plants[i].maxTurbines][12])
                   @constraint(model, production[i,t,w]<=h.z+h.x*discharge_water[i,t,w]+h.y*reservoir_volume[i,t,w])
-                end
+                #end
               end
             end
           end
