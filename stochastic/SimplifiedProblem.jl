@@ -683,19 +683,27 @@ function create_optimization_model()
         
   
         if(i==1)
-            volume_anonymised=round(JuMP.value(reservoir_volume[i,t,1]),sigdigits=8)*100/config["CCD"]["max_storable_water"]
+            OldRange = (config["CCD"]["max_storable_water"] - config["CCD"]["min_storable_water"])  
+            NewRange = (0 - 100)  
+            volume_anonymised = (((round(JuMP.value(reservoir_volume[i,t,1]),sigdigits=8) - config["CCD"]["min_storable_water"]) * NewRange) / OldRange)
             discharge_anonymised=round(JuMP.value(discharge_water[i,t,1]),sigdigits=8)*100/config["CCD"]["max_discharge_flow"]
             production_anonymised=round(JuMP.value(production[i,t,1]),sigdigits=8)*100/config["CCD"]["maxPower"]
         elseif(i==2)
-            volume_anonymised=round(JuMP.value(reservoir_volume[i,t,1]),sigdigits=8)*100/config["CCS"]["max_storable_water"]
+            OldRange = (config["CCS"]["max_storable_water"] - config["CCS"]["min_storable_water"])  
+            NewRange = (0 - 100)  
+            volume_anonymised = (((round(JuMP.value(reservoir_volume[i,t,1]),sigdigits=8) - config["CCS"]["min_storable_water"]) * NewRange) / OldRange)
             discharge_anonymised=round(JuMP.value(discharge_water[i,t,1]),sigdigits=8)*100/config["CCS"]["max_discharge_flow"]
             production_anonymised=round(JuMP.value(production[i,t,1]),sigdigits=8)*100/config["CCS"]["maxPower"]
         elseif(i==3)
-            volume_anonymised=round(JuMP.value(reservoir_volume[i,t,1]),sigdigits=8)*100/config["CIM"]["max_storable_water"]
+            OldRange = (config["CIM"]["max_storable_water"] - config["CIM"]["min_storable_water"])  
+            NewRange = (0 - 100)  
+            volume_anonymised = (((round(JuMP.value(reservoir_volume[i,t,1]),sigdigits=8) - config["CIM"]["min_storable_water"]) * NewRange) / OldRange)
             discharge_anonymised=round(JuMP.value(discharge_water[i,t,1]),sigdigits=8)*100/config["CIM"]["max_discharge_flow"]
             production_anonymised=round(JuMP.value(production[i,t,1]),sigdigits=8)*100/config["CIM"]["maxPower"]
         else(i==4)
-            volume_anonymised=round(JuMP.value(reservoir_volume[i,t,1]),sigdigits=8)*100/config["CSH"]["max_storable_water"]
+            OldRange = (config["CSH"]["max_storable_water"] - config["CSH"]["min_storable_water"])  
+            NewRange = (0 - 100)  
+            volume_anonymised = (((round(JuMP.value(reservoir_volume[i,t,1]),sigdigits=8) - config["CSH"]["min_storable_water"]) * NewRange) / OldRange)
             discharge_anonymised=round(JuMP.value(discharge_water[i,t,1]),sigdigits=8)*100/config["CSH"]["max_discharge_flow"]
             production_anonymised=round(JuMP.value(production[i,t,1]),sigdigits=8)*100/config["CSH"]["maxPower"]
             end
